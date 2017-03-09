@@ -108,7 +108,6 @@ var database = firebase.database();
 $("#add-train-btn").on("click", function(event) {
   event.preventDefault();
 
-  // Grabs user input
   var trainName = $("#train-name-input").val().trim();
   var trainDestination = $("#destination-input").val().trim();
   var trainStart = moment($("#start-input").val().trim(), "hh:mm");
@@ -134,9 +133,6 @@ $("#add-train-btn").on("click", function(event) {
   console.log(newtrain.rate);
 
   
-  alert("Train successfully added");
-
-  
   $("#train-name-input").val("");
   $("#destination-input").val("");
   $("#start-input").val("");
@@ -149,7 +145,6 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
 
   console.log(childSnapshot.val());
 
-  // Store everything into a variable.
   var trainName = childSnapshot.val().name;
   var trainDestination = childSnapshot.val().destination;
   var trainStartConverted = childSnapshot.val().start;
