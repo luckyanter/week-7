@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+
+  <head>
+
+    <meta charset="UTF-8">
+    <title>Train Tracker</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Firebase Reference -->
+    <script src="https://www.gstatic.com/firebasejs/3.7.0/firebase.js"></script>
+
+ 
+    <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <!-- Jumbotron -->
+      <div class="jumbotron" style="background-color: black; color: white">
+        <h1 class="text-center">Anytime is train time</h1>
+        <h3 class="text-center">choo choo. chee chee.</h3>
+      </div>
+
+      <div class="row">
+
+        <div class="col-lg-12">
+
+        <!-- Current Employees-->
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title"><strong>Current Employees</strong></h3>
+            </div>
+            <div class="panel-body">
+              <table class="table table-hover" id='employee-table'>
+                <thead>
+                  <tr>
+                    <th>train Name</th>
+                    <th>Destination</th>
+                    <th>Frequency(min)</th>
+                    <th>Next Arrival</th>
+                    <th>Minutes Away</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Add Employee  -->
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title"><strong>Add Train</strong></h3>
+            </div>
+            <div class="panel-body">
+
+              <!-- Entry Form -->
+              <form>
+                <div class="form-group">
+                  <label for="employee-name-input">Train Name</label>
+                  <input class="form-control" id="employee-name-input" type="text">
+                </div>
+                <div class="form-group">
+                  <label for="role-input">Destination</label>
+                  <input class="form-control" id="role-input" type="text">
+                </div>
+                <div class="form-group">
+                  <label for="start-input">First Train Time (HH:mm - military Time)</label>
+                  <input class="form-control" id="start-input" type="text">
+                </div>
+                <div class="form-group">
+                  <label for="rate-input">Frequency(min)</label>
+                  <input class="form-control" id="rate-input" type="text">
+                </div>
+                <button class="btn btn-primary" id="add-employee-btn" type="submit">Submit</button>
+              </form>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <script >
+
+  var config = {
+    apiKey: "AIzaSyBX-fTUd2HmISOSool-fZJEnd5-TNzOENA",
+    authDomain: "awesome-519f2.firebaseapp.com",
+    databaseURL: "https://awesome-519f2.firebaseio.com",
+    storageBucket: "awesome-519f2.appspot.com",
+    messagingSenderId: "725987535297"
+  };
+  firebase.initializeApp(config);
+
+var database = firebase.database();
+
+$("#add-employee-btn").on("click", function(event) {
+  event.preventDefault();
+
+  // Grabs user input
+  var empName = $("#employee-name-input").val().trim();
+  var empRole = $("#role-input").val().trim();
+  var empStart = moment($("#start-input").val().trim(), "hh:mm");
+  var empStartConverted = empStart.format("hh:mm");
+  console.log(empStart);
+  console.log(empStartConverted);
+  var empRate = $("#rate-input").val().trim();
+
+
+  // Creates local "temporary" object for holding employee data
+  var newEmp = {
+    name: empName,
+    role: empRole,
+    start: empStartConverted,
+    rate: empRate
+  };
+
+  // Uploads employee data to the database
+  database.ref().push(newEmp);
+
+  console.log(newEmp.name);
+  console.log(newEmp.role);
+  console.log(newEmp.start);
+  console.log(newEmp.rate);
+
+  // Alert
+  alert("Train successfully added");
+
+  // Clears all of the text-boxes
+  $("#employee-name-input").val("");
+  $("#role-input").val("");
+  $("#start-input").val("");
+  $("#rate-input").val("");
+
+});
+
+// 3. Create Firebase event for adding employee to the database and a row in the html when a user adds an entry
+database.ref().on("child_added", function(childSnapshot, prevChildKey) {
+
+  console.log(childSnapshot.val());
+
+  // Store everything into a variable.
+  var empName = childSnapshot.val().name;
+  var empRole = childSnapshot.val().role;
+  var empStart = childSnapshot.val().start;
+  var empRate = childSnapshot.val().rate;
+
+  // Employee Info
+  console.log(empName);
+  console.log(empRole);
+  console.log(empStart);
+  console.log(empRate);
+
+  // Prettify the employee start
+  var currentTime = moment();
+  console.log(currentTime);
+  console.log("CURRENT TIME: " + currentTime.format("hh:mm"));
+  var diffTime = currentTime.diff(empStart, "minutes");
+  console.log("DIFFERENCE IN TIME: " + diffTime);
+  var tRemainder = diffTime % empRate;
+  console.log(tRemainder);
+  var tMinutesTillTrain = empRate - tRemainder;
+  console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+  var nextTrain = currentTime.add(tMinutesTillTrain, "minutes");
+  console.log(nextTrain);
+  var nextTrainConverted = nextTrain.format("hh:mm");
+  console.log("ARRIVAL TIME: " + nextTrainConverted);
+
+
+
+  // var empStartPretty = moment.unix(empStart).format("MM/DD/YY");
+
+  // var empMonths = moment().diff(moment.unix(empStart, "X"), "months");
+  // console.log(empMonths);
+
+  // var empBilled = empMonths * empRate;
+  // console.log(empBilled);
+
+  // Add each train's data into the table
+  $("#employee-table > tbody").append("<tr><td>" + empName + "</td><td>" + empRole + "</td><td>" +
+  empRate + "</td><td>" + nextTrainConverted + "</td><td>" + tMinutesTillTrain + "</td></tr>");
+});
+
+
+
+
+
+    // var tFrequency = 3;
+    // var firstTime = "03:30";
+    // var firstPeroid = moment(firstTime, "hh:mm");
+    // var currentTime = moment();
+    // console.log("CURRENT TIME: " + currentTime.format("hh:mm"));
+
+    // var diffTime = currentTime.diff(firstTimeConverted, "minutes");
+    // console.log("DIFFERENCE IN TIME: " + diffTime);
+
+    // var tRemainder = diffTime % tFrequency;
+    // console.log(tRemainder);
+
+    // var tMinutesTillTrain = tFrequency - tRemainder;
+    // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+    // var nextTrain = currentTime.add(tMinutesTillTrain, "minutes");
+    // console.log(nextTrain);
+    // console.log("ARRIVAL TIME: " + nextTrain.format("hh:mm"));
+
+
+    </script>
+
+  </body>
+
+</html>
