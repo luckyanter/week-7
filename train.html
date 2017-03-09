@@ -25,7 +25,7 @@
     <div class="container">
 
       <!-- Jumbotron -->
-      <div class="jumbotron" style="background-color: black; color: white">
+      <div class="jumbotron" style="background-color: black; color: yellow">
         <h1 class="text-center">Anytime is train time</h1>
         <h3 class="text-center">choo choo. chee chee.</h3>
       </div>
@@ -34,13 +34,12 @@
 
         <div class="col-lg-12">
 
-        <!-- Current Employees-->
           <div class="panel panel-primary">
             <div class="panel-heading">
-              <h3 class="panel-title"><strong>Current Employees</strong></h3>
+              <h3 class="panel-title"><strong>Current Trains</strong></h3>
             </div>
-            <div class="panel-body">
-              <table class="table table-hover" id='employee-table'>
+            <div class="panel-body" style="background-color: pink; color: black">
+              <table class="table table-hover" id='train-table'>
                 <thead>
                   <tr>
                     <th>train Name</th>
@@ -56,22 +55,21 @@
             </div>
           </div>
 
-          <!-- Add Employee  -->
+         
           <div class="panel panel-primary">
             <div class="panel-heading">
               <h3 class="panel-title"><strong>Add Train</strong></h3>
             </div>
             <div class="panel-body">
 
-              <!-- Entry Form -->
-              <form>
-                <div class="form-group">
-                  <label for="employee-name-input">Train Name</label>
-                  <input class="form-control" id="employee-name-input" type="text">
+              <form style="background-color: skyblue; color: white">
+                <div class="form-group" >
+                  <label for="train-name-input">Train Name</label>
+                  <input class="form-control" id="train-name-input" type="text">
                 </div>
                 <div class="form-group">
-                  <label for="role-input">Destination</label>
-                  <input class="form-control" id="role-input" type="text">
+                  <label for="destination-input">Destination</label>
+                  <input class="form-control" id="destination-input" type="text">
                 </div>
                 <div class="form-group">
                   <label for="start-input">First Train Time (HH:mm - military Time)</label>
@@ -81,7 +79,7 @@
                   <label for="rate-input">Frequency(min)</label>
                   <input class="form-control" id="rate-input" type="text">
                 </div>
-                <button class="btn btn-primary" id="add-employee-btn" type="submit">Submit</button>
+                <button class="btn btn-primary" id="add-train-btn" type="submit">Submit</button>
               </form>
 
             </div>
@@ -107,73 +105,70 @@
 
 var database = firebase.database();
 
-$("#add-employee-btn").on("click", function(event) {
+$("#add-train-btn").on("click", function(event) {
   event.preventDefault();
 
   // Grabs user input
-  var empName = $("#employee-name-input").val().trim();
-  var empRole = $("#role-input").val().trim();
-  var empStart = moment($("#start-input").val().trim(), "hh:mm");
-  var empStartConverted = empStart.format("hh:mm");
-  console.log(empStart);
-  console.log(empStartConverted);
-  var empRate = $("#rate-input").val().trim();
+  var trainName = $("#train-name-input").val().trim();
+  var trainDestination = $("#destination-input").val().trim();
+  var trainStart = moment($("#start-input").val().trim(), "hh:mm");
+  var trainStartConverted = trainStart.format("hh:mm");
+  console.log(trainStart);
+  console.log(trainStartConverted);
+  var trainRate = $("#rate-input").val().trim();
 
 
-  // Creates local "temporary" object for holding employee data
-  var newEmp = {
-    name: empName,
-    role: empRole,
-    start: empStartConverted,
-    rate: empRate
+  var newtrain = {
+    name: trainName,
+    destination: trainDestination,
+    start: trainStartConverted,
+    rate: trainRate
   };
 
-  // Uploads employee data to the database
-  database.ref().push(newEmp);
+ 
+  database.ref().push(newtrain);
 
-  console.log(newEmp.name);
-  console.log(newEmp.role);
-  console.log(newEmp.start);
-  console.log(newEmp.rate);
+  console.log(newtrain.name);
+  console.log(newtrain.destination);
+  console.log(newtrain.start);
+  console.log(newtrain.rate);
 
-  // Alert
+  
   alert("Train successfully added");
 
-  // Clears all of the text-boxes
-  $("#employee-name-input").val("");
-  $("#role-input").val("");
+  
+  $("#train-name-input").val("");
+  $("#destination-input").val("");
   $("#start-input").val("");
   $("#rate-input").val("");
 
 });
 
-// 3. Create Firebase event for adding employee to the database and a row in the html when a user adds an entry
+
 database.ref().on("child_added", function(childSnapshot, prevChildKey) {
 
   console.log(childSnapshot.val());
 
   // Store everything into a variable.
-  var empName = childSnapshot.val().name;
-  var empRole = childSnapshot.val().role;
-  var empStartConverted = childSnapshot.val().start;
-  var empStart = moment($(empStartConverted, "hh:mm"));
-  var empRate = childSnapshot.val().rate;
+  var trainName = childSnapshot.val().name;
+  var trainDestination = childSnapshot.val().destination;
+  var trainStartConverted = childSnapshot.val().start;
+  var trainStart = moment($(trainStartConverted, "hh:mm"));
+  var trainRate = childSnapshot.val().rate;
 
-  // Employee Info
-  console.log(empName);
-  console.log(empRole);
-  console.log(empStartConverted);
-  console.log(empRate);
+  console.log(trainName);
+  console.log(trainDestination);
+  console.log(trainStartConverted);
+  console.log(trainRate);
 
-  // Prettify the employee start
   var currentTime = moment();
   console.log(currentTime);
   console.log("CURRENT TIME: " + currentTime.format("hh:mm"));
-  var diffTime = currentTime.diff(empStart, "minutes");
+  var diffTime = currentTime.diff(trainStart, "minutes");
   console.log("DIFFERENCE IN TIME: " + diffTime);
-  var tRemainder = diffTime % empRate;
+  var tRemainder = diffTime % trainRate;
   console.log(tRemainder);
-  var tMinutesTillTrain = empRate - tRemainder;
+  var tMinutesTillTrain = trainRate - tRemainder;
   console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
   var nextTrain = currentTime.add(tMinutesTillTrain, "minutes");
   console.log(nextTrain);
@@ -181,8 +176,8 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
   console.log("ARRIVAL TIME: " + nextTrainConverted);
 
 
-  $("#employee-table > tbody").append("<tr><td>" + empName + "</td><td>" + empRole + "</td><td>" +
-  empRate + "</td><td>" + nextTrainConverted + "</td><td>" + tMinutesTillTrain + "</td></tr>");
+  $("#train-table > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDestination + "</td><td>" +
+  trainRate + "</td><td>" + nextTrainConverted + "</td><td>" + tMinutesTillTrain + "</td></tr>");
 });
 
 
