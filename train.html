@@ -155,13 +155,14 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
   // Store everything into a variable.
   var empName = childSnapshot.val().name;
   var empRole = childSnapshot.val().role;
-  var empStart = childSnapshot.val().start;
+  var empStartConverted = childSnapshot.val().start;
+  var empStart = moment($(empStartConverted, "hh:mm"));
   var empRate = childSnapshot.val().rate;
 
   // Employee Info
   console.log(empName);
   console.log(empRole);
-  console.log(empStart);
+  console.log(empStartConverted);
   console.log(empRate);
 
   // Prettify the employee start
@@ -180,42 +181,9 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
   console.log("ARRIVAL TIME: " + nextTrainConverted);
 
 
-
-  // var empStartPretty = moment.unix(empStart).format("MM/DD/YY");
-
-  // var empMonths = moment().diff(moment.unix(empStart, "X"), "months");
-  // console.log(empMonths);
-
-  // var empBilled = empMonths * empRate;
-  // console.log(empBilled);
-
-  // Add each train's data into the table
   $("#employee-table > tbody").append("<tr><td>" + empName + "</td><td>" + empRole + "</td><td>" +
   empRate + "</td><td>" + nextTrainConverted + "</td><td>" + tMinutesTillTrain + "</td></tr>");
 });
-
-
-
-
-
-    // var tFrequency = 3;
-    // var firstTime = "03:30";
-    // var firstPeroid = moment(firstTime, "hh:mm");
-    // var currentTime = moment();
-    // console.log("CURRENT TIME: " + currentTime.format("hh:mm"));
-
-    // var diffTime = currentTime.diff(firstTimeConverted, "minutes");
-    // console.log("DIFFERENCE IN TIME: " + diffTime);
-
-    // var tRemainder = diffTime % tFrequency;
-    // console.log(tRemainder);
-
-    // var tMinutesTillTrain = tFrequency - tRemainder;
-    // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
-
-    // var nextTrain = currentTime.add(tMinutesTillTrain, "minutes");
-    // console.log(nextTrain);
-    // console.log("ARRIVAL TIME: " + nextTrain.format("hh:mm"));
 
 
     </script>
